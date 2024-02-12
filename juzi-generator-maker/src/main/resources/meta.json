@@ -6,8 +6,9 @@
   "author": "juzi",
   "createTime": "2024-2-11",
   "fileConfig": {
-    "inputRootPath": "/Users/xiaoxie/Documents/javacode/juzi-generator/juzi-generator-demo-projects/acm-template-pro",
-    "outputRootPath": "generated",
+    "inputRootPath": ".source/acm-template-pro",
+    "outputRootPath": "/Users/xiaoxie/Documents/javacode/juzi-generator/acm-template-pro",
+    "sourceRootPath": "/Users/xiaoxie/Documents/javacode/juzi-generator/juzi-generator-demo-projects/acm-template-pro",
     "type": "dir",
     "files": [
       {
