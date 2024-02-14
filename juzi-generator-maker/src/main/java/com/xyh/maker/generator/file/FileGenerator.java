@@ -1,6 +1,5 @@
 package com.xyh.maker.generator.file;
 
-import com.xyh.maker.model.DataModel;
 import freemarker.template.TemplateException;
 
 import java.io.File;
@@ -23,13 +22,5 @@ public class FileGenerator {
         String inputDynamicFilePath = projectPath + File.separator + "src/main/resources/templates/MainTemplate.java.ftl";
         String outputDynamicFilePath = outputPath + File.separator + "acm-template/src/com/xyh/acm/MainTemplate.java";
         DynamicFileGenerator.doGenerate(inputDynamicFilePath, outputDynamicFilePath, model);
-    }
-
-    public static void main(String[] args) throws TemplateException, IOException {
-        DataModel dataModel = new DataModel();
-        dataModel.setAuthor("juzi");
-        dataModel.setLoop(false);
-        dataModel.setOutputText("求和结果：");
-        doGenerate(dataModel);
     }
 }
