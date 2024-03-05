@@ -2,12 +2,17 @@ package com.xyh.springbootinit.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
+import com.qcloud.cos.utils.IOUtils;
 import com.xyh.springbootinit.common.*;
 import com.xyh.springbootinit.constant.UserConstant;
 import com.xyh.springbootinit.exception.BusinessException;
 import com.xyh.springbootinit.exception.ThrowUtils;
+import com.xyh.springbootinit.manager.CosManager;
 import com.xyh.springbootinit.meta.Meta;
 import com.xyh.springbootinit.model.dto.generator.GeneratorAddRequest;
 import com.xyh.springbootinit.model.dto.generator.GeneratorEditRequest;
@@ -19,8 +24,11 @@ import com.xyh.springbootinit.model.vo.GeneratorVO;
 import com.xyh.springbootinit.service.GeneratorService;
 import com.xyh.springbootinit.service.UserService;
 
+import java.io.IOException;
 import java.util.List;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +48,9 @@ public class GeneratorController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private CosManager cosManager;
 
 
     /**
@@ -233,6 +244,53 @@ public class GeneratorController {
         }
         boolean result = generatorService.updateById(Generator);
         return ResultUtils.success(result);
+    }
+
+    /**
+     * 根据 id 下载
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/download")
+    public void downloadGeneratorById(long id, HttpServletResponse response) throws IOException {
+        if (id <= 0) {
+            throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
+        }
+        User loginUser = userService.getCurrentUser();
+        Generator generator = generatorService.getById(id);
+        if (generator == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR);
+        }
+
+        String filepath = generator.getDistPath();
+        if (StrUtil.isBlank(filepath)) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR, "产物包不存在");
+        }
+
+        // 追踪事件
+        log.info("用户 {} 下载了 {}", loginUser, filepath);
+
+        COSObjectInputStream cosObjectInput = null;
+        try {
+            COSObject cosObject = cosManager.getObject(filepath);
+            cosObjectInput = cosObject.getObjectContent();
+            // 处理下载到的流
+            byte[] bytes = IOUtils.toByteArray(cosObjectInput);
+            // 设置响应头
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
+            // 写入响应
+            response.getOutputStream().write(bytes);
+            response.getOutputStream().flush();
+        } catch (Exception e) {
+            log.error("file download error, filepath = " + filepath, e);
+            throw new BusinessException(ResultCodeEnum.SYSTEM_ERROR, "下载失败");
+        } finally {
+            if (cosObjectInput != null) {
+                cosObjectInput.close();
+            }
+        }
     }
 
 }

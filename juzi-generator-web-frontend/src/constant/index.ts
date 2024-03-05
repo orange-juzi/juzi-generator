@@ -13,3 +13,8 @@ export const BACKEND_HOST_PROD: string = "https://...";
  */
 export const TOKEN: string = "token";
 
+/**
+ * COS 访问地址
+ */
+export const COS_HOST = "https://juzi-1311432520.cos.ap-nanjing.myqcloud.com";
+

@@ -1,7 +1,9 @@
 # My Custom
 
 target
-
+application-local.yml
+generated
+.temp
 ### Java template
 # Compiled class file
 *.class

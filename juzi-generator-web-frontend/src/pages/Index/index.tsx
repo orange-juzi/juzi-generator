@@ -1,9 +1,10 @@
+import { listGeneratorVoByPageUsingPost } from '@/services/frontend-init/generatorController';
 import { UserOutlined } from '@ant-design/icons';
 import { PageContainer, ProFormSelect, ProFormText, QueryFilter } from '@ant-design/pro-components';
+import { Link } from '@umijs/max';
 import { Avatar, Card, Flex, Image, Input, List, message, Tabs, Tag, Typography } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import {listGeneratorVoByPageUsingPost} from "@/services/frontend-init/generatorController";
 
 /**
  * 默认分页参数
@@ -113,8 +114,8 @@ const IndexPage: React.FC = () => {
         labelAlign="left"
         defaultCollapsed={false}
         style={{ padding: '16px 0' }}
-        onReset={()=>{
-          doSearch()
+        onReset={() => {
+          doSearch();
         }}
         onFinish={async (values: API.GeneratorQueryRequest) => {
           setSearchParams({
@@ -159,25 +160,27 @@ const IndexPage: React.FC = () => {
         }}
         renderItem={(data) => (
           <List.Item>
-            <Card hoverable cover={<Image alt={data.name} src={data.picture} />}>
-              <Card.Meta
-                title={<a>{data.name}</a>}
-                description={
-                  <Typography.Paragraph ellipsis={{ rows: 2 }} style={{ height: 44 }}>
-                    {data.description}
-                  </Typography.Paragraph>
-                }
-              />
-              {tagListView(data.tags)}
-              <Flex justify="space-between" align="center">
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                  {moment(data.createTime).fromNow()}
-                </Typography.Text>
-                <div>
-                  <Avatar src={data.user?.userAvatar ?? <UserOutlined />} />
-                </div>
-              </Flex>
-            </Card>
+            <Link to={`/generator/detail/${data.id}`}>
+              <Card hoverable cover={<Image alt={data.name} src={data.picture} />}>
+                <Card.Meta
+                  title={<a>{data.name}</a>}
+                  description={
+                    <Typography.Paragraph ellipsis={{ rows: 2 }} style={{ height: 44 }}>
+                      {data.description}
+                    </Typography.Paragraph>
+                  }
+                />
+                {tagListView(data.tags)}
+                <Flex justify="space-between" align="center">
+                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                    {moment(data.createTime).fromNow()}
+                  </Typography.Text>
+                  <div>
+                    <Avatar src={data.user?.userAvatar ?? <UserOutlined />} />
+                  </div>
+                </Flex>
+              </Card>
+            </Link>
           </List.Item>
         )}
       />
